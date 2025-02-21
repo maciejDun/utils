@@ -8,6 +8,9 @@ import org.slf4j.event.Level;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
 
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+
 @Slf4j
 @Aspect
 @Component
@@ -24,13 +27,10 @@ class ExecutionTimeAspect {
 
         stopWatch.stop();
 
-        long totalTimeMillis = stopWatch.getTotalTimeMillis();
-        long minutes = totalTimeMillis / 60000;
-        long seconds = (totalTimeMillis % 60000) / 1000;
-        long millis = totalTimeMillis % 1000;
+        Duration executionDuration = Duration.of(stopWatch.getTotalTimeMillis(), ChronoUnit.MILLIS);
 
         log.atLevel(Level.valueOf(measureExecutionTime.logLevel().name())).log("\"{}\" executed in {} minutes, {} seconds, {} milliseconds",
-                measureExecutionTime.businessProcessName(), minutes, seconds, millis);
+                measureExecutionTime.businessProcessName(), executionDuration.toMinutesPart(), executionDuration.toSecondsPart(), executionDuration.toMillisPart());
         return proceed;
     }
 }
